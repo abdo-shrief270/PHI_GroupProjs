@@ -8,9 +8,8 @@ LiquidCrystal_I2C lcd(0x27, 2, 1, 0, 4, 5, 6, 7, 3, POSITIVE);
 String chrs,mes,msgDecoded,code,codes;
 
 void setup() {
-
-  lcd.begin(16, 2);  //Defining 16 columns and 2 rows of lcd display
-  lcd.backlight();   //To Power ON the back light
+  lcd.begin(16, 2);
+  lcd.backlight();
   Serial.begin(9600);
 }
 
@@ -49,7 +48,6 @@ void loop() {
           flag = true;
           break;
         }
-
     }
     if (flag) {
         code = "";

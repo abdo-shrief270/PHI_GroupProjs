@@ -1,59 +1,58 @@
 clc;clear ;close all;
+
 instrhwinfo('Bluetooth','HC-05')
-% Create a bluetooth variable and open it at channel 1
 device = Bluetooth('HC-05', 1)
-% Pair with device
-fopen(device)
-disp('Device is Connected ')
+disp('Device is Connected ');
+
 
 while(1)
-    %% Transmitter
     
+    %% Transmitter
     mes=input('Enter the Message : ','s');
     [chrs,props]=find_msg_prop(mes);
+    disp('Symbols Of The Message : ');
+    disp(chrs);
+    
+    disp('Proppabilites Of Each Symbol : ');
+    disp(props);
+    
     [codebook] = binaryHuffman(props);
-    codeRecieved=[];
-    sym='';
+    disp('Code For Each Symbol : ');
+    disp(codebook);
+    mes_bin='';
     for i=1:length(mes)
-        sym=append(sym,codebook(strfind(chrs,mes(i))));
+        mes_bin=strcat(mes_bin,codebook(strfind(chrs,mes(i))));
     end
-    sym
-
-    %% Write command to HC-05/Arduino
+    
+    disp('Message After Encoding In Binary : ');
+    disp(mes_bin);
+    
+    %% Send Symbols To The Reciever
+    
+    fopen(device)
     for i=1:length(chrs)
         fwrite(device,chrs(i));
-        fwrite(device,',');
     end
- 
-    fwrite(device,'-');
-    for i=1:length(codebook)
-        fwrite(device,',');
-        fwrite(device,char(codebook(i)));
-    end
-    fwrite(device,',-,');
-    fwrite(device,char(sym));
-    %% Reciever
-    disp('Reciever Part')
-    msgDecoded='';
-    code='';
-    sym=char(sym);
-    l=length(sym);
-    % sym=convertC  (sym)
-    for i = 1:l
-        code=strcat(code,sym(i));
-        condArr=strcmp(codebook,code);
-        flag=sum(condArr);
-        if flag ==1
-            for j = 1 : length(codebook)
-                if condArr(j) == 1
-                    msgDecoded = strcat(msgDecoded, chrs(j));
-                    break;
-                end
-            end
-            if i ~= l
-            code='';
-            end
-        end
-    end
-end
     fclose(device)
+    disp('Symbols Are Transmitted Successfully');
+    
+    fopen(device)
+    for i=1:length(codebook)
+        fwrite(device,char(codebook(i)));
+        fwrite(device,',')
+    end
+    fclose(device)
+    disp('Symbol Codes Are Transmitted Successfully');
+    
+    fopen(device)
+    fwrite(device,char(mes_bin));
+    fclose(device)
+    disp('Binary Message Are Transmitted Successfully');
+    
+end
+
+
+
+
+
+    
