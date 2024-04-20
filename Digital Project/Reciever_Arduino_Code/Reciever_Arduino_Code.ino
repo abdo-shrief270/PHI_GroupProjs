@@ -1,11 +1,12 @@
-/* www.learningbuz.com */
-/*Impport following Libraries*/
 #include <Wire.h>
 #include "string.h"
 #include <LiquidCrystal_I2C.h>
+
 //I2C pins declaration
 LiquidCrystal_I2C lcd(0x27, 2, 1, 0, 4, 5, 6, 7, 3, POSITIVE);
-String chrs,mes,msgDecoded,code,codes;
+
+//Variables Decleration
+String chrs,codes,mes,msgDecoded,code;
 
 void setup() {
   lcd.begin(16, 2);
@@ -14,47 +15,56 @@ void setup() {
 }
 
 void loop() {
+  //Set Position Of Cursor In LCD
   lcd.setCursor(0, 0);
-  String codebook[10]={"","","","","","","","","",""};
-  while(!Serial.available());
+
+  //Clear All Variables
+  String codebook[20]={"","","","","","","","","","","","","","","","","","","",""};
   chrs="";
-  chrs=Serial.readStringUntil('\n');
-  Serial.println(chrs);
-  code="";
-  codes=Serial.readStringUntil('\n');
+  codes="";
   mes="";
+  msgDecoded="";
+  code="";
+
+  //Recieve From Labtop
+  while(!Serial.available());
+  chrs=Serial.readStringUntil('\n');
+  codes=Serial.readStringUntil('\n');
   mes=Serial.readStringUntil('\n');
 
+  // Clear LCD
   lcd.clear();
+
+  //Convert Codes String Into Codebook Array
   int k=0;
   for(int j=0;j<codes.length();j++){
     if(codes.charAt(j)==','){
-      // Serial.println("ok1");
       k++;
-      continue;
     }else{
       codebook[k]+=codes.charAt(j);
     }
   }
-  msgDecoded="";
-  code="";
+
+  // Decoed Binary Message
   for(int i=0;i<mes.length();i++){
     code += mes.charAt(i);
     boolean flag = false;
-    for (int j = 0; j < 10; j++) {
-        if (code.equals(codebook[j])) {
-          msgDecoded += chrs.charAt(j);
-          // Serial.println("ok2");
-          flag = true;
-          break;
-        }
+    for (int j = 0; j < 20; j++) {
+      if (code.equals(codebook[j])) {
+        msgDecoded += chrs.charAt(j);
+        flag = true;
+        break;
+      }
     }
     if (flag) {
-        code = "";
+      code = "";
     }
   }
   
+  // Print Message On Lcd
   for(int i=0;i<msgDecoded.length();i++){
     lcd.print(msgDecoded.charAt(i));
+    delay(100);
   }
+
 }
