@@ -30,7 +30,7 @@ void sendSMSUsingSIM808(String phone, String Mes) {
 
 void getGPSDataFromSIM808() {
   String data = "";
-  if (!SendComToSIM808AndCheckForResp("AT+CGPSSTATUS?", "D")) {
+  if (SendComToSIM808AndCheckForResp("AT+CGPSSTATUS?", "D")) {
     GPS_Data_Flag = true;
     serialRes = SendComToSIM808("AT+CGPSINF=0");
     serialRes = serialRes.substring(12, 35);
